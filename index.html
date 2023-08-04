@@ -1,0 +1,80 @@
+<html>
+  <head>
+    <title>Pega Data Model Visualization</title>
+    <script src="./build/sigma.js"></script>
+    <script src="./build/plugins/sigma.layout.noverlap.min.js"></script>
+    <script src="./build/plugins/sigma.layout.forceAtlas2.min.js"></script>
+    <script src="./build/plugins/sigma.layout.fruchtermanReingold.js"></script>
+    <script src="./build/plugins/sigma.plugins.neighborhoods.min.js"></script>
+    <script src="./build/plugins/sigma.plugins.animate.min.js"></script>
+    <script src="index.js"></script>
+    <script type="text/java" src ="parser.java"></script>
+    <script type="text/javascript" src="data.js"></script>
+    <link rel="icon" href="./Imgs/487912.png">
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <style>
+      html { height:100%;}
+      body {height: 100%;}
+      #sigma-container { width:100%; height:100%;}
+    </style>
+  </head>
+  <body>
+    <div id='sigma-container'>
+        <input id="searchInput" class="searchInputStyle" placeholder="Search for a node">
+        <div id="suggestionBox"></div>
+        <div id="zoom-buttons">
+        <button id="Zin" class="zoom-buttonIn">+</button>
+        <button id="Zout" class="zoom-buttonOut">-</button>
+        <div id="showingHelpInfo" class = "instructions">
+          <ol>
+              <li>Copy and paste the follwing command in the Pega sql database <strong>(Note that you can change the class names in the second to last row)</strong>:</li>
+              <pre><code>WITH
+                  app_rulesets_pc0
+                  AS
+                  (
+                                  SELECT "PC0AR".pzRuleSetName AS "pzRuleSetName",
+              "PC0AR".pzRuleSetVersionMajor AS "pzRuleSetVersionMajor",
+              "PC0AR".pzRuleSetVersionMinor AS "pzRuleSetVersionMinor",
+              "PC0AR".pzRuleSetVersionPatch AS "pzRuleSetVersionPatch"
+                          FROM ( SELECT "PC0AR".pzRuleSetName,
+              "PC0AR".pzRuleSetVersionMajor,
+              "PC0AR".pzRuleSetVersionMinor,
+              "PC0AR".pzRuleSetVersionPatch, ROW_NUMBER() OVER (PARTITION BY "PC0AR".pzRuleSetName ORDER BY "PC0AH".pzAppHeight) AS "pzRuleSetOrder"
+                              FROM PegaRULES.pr_sys_app_hierarchy_flat "PC0AH" INNER JOIN PegaRULES.pr_sys_app_ruleset_index "PC0AR" ON ("PC0AH".pzAppHash = "PC0AR".pzAppHash)
+                              WHERE "PC0AH".pzTopAppHash = 'ACERS1_DEV!01.01.01$1d9162277dcaa243e8e07e3cbb3ded36' ) "PC0AR"
+                          WHERE "PC0AR"."pzRuleSetOrder" = 1
+                      UNION ALL
+                          SELECT CAST('B5340@' AS VARCHAR(128)) AS "pzRuleSetName",
+              1 AS "pzRuleSetVersionMajor",
+              1 AS "pzRuleSetVersionMinor",
+              1 AS "pzRuleSetVersionPatch"
+                  )
+              SELECT "PC0"."pyClassName" AS "pyClassName",
+              "PC0"."pyPropertyName" AS "pyPropertyName",
+              "PC0"."pyPropertyMode" AS "pyPropertyMode",
+              "PC0"."pyPageClass" AS "pyPageClass",
+              "PC0"."pyStringType" AS "pyStringType", CONCAT("PC0"."pyRuleSet",':' ,
+              "PC0"."pyRuleSetVersion") AS "pyTextValue(1)",
+              "PC0"."pxUpdateDateTime" AS "pxUpdateDateTime",
+              "PC0"."pxUpdateOpName" AS "pxUpdateOpName",
+              "PC0"."pzInsKey" AS "pzInsKey"
+              FROM PegaRULES.pr4_rule_property "PC0" INNER JOIN app_rulesets_pc0 "PC0AR" ON ((( ("PC0".pzRuleSetVersionMajor IS NULL OR "PC0".pzRuleSetVersionMajor = -1) AND ("PC0".pyRuleSet = "PC0AR"."pzRuleSetName")) OR (("PC0".pzRuleSetVersionMajor IS NOT NULL AND "PC0".pzRuleSetVersionMajor != -1) AND ("PC0".pyRuleSet = "PC0AR"."pzRuleSetName") AND ("PC0".pzRuleSetVersionMajor = "PC0AR"."pzRuleSetVersionMajor") AND (("PC0AR"."pzRuleSetVersionMinor" != -1 AND "PC0AR"."pzRuleSetVersionPatch" != -1 AND (("PC0".pzRuleSetVersionMinor < "PC0AR"."pzRuleSetVersionMinor") OR ("PC0".pzRuleSetVersionMinor = "PC0AR"."pzRuleSetVersionMinor" AND "PC0".pzRuleSetVersionPatch <= "PC0AR"."pzRuleSetVersionPatch"))) OR ("PC0AR"."pzRuleSetVersionMinor" != -1 AND "PC0AR"."pzRuleSetVersionPatch" = -1 AND "PC0".pzRuleSetVersionMinor <= "PC0AR"."pzRuleSetVersionMinor") OR ("PC0AR"."pzRuleSetVersionMinor" = -1)))) )
+              WHERE ( ( "PC0"."pyClassName" IN ('Data-' , 'NFCU' , 'NFCU-Data' , 'NFCU-Data-ACCT' , 'NFCU-Data-ACCT-Account' , 'NFCU-Data-ACCT-Account-Len' , 'NFCU-Data-ACCT-Account-CC' ) OR "PC0"."pyClassName" IS NULL ) ) AND "PC0"."pxObjClass" = 'Rule-Obj-Property'
+              ORDER BY 1 DESC</code></pre>
+              <li>Upload the file using the upload button, then press the check mark button</li>
+          </ol> 
+      </div>
+        </div>
+    </div>
+    <label for="fileInput" class="customFileLabel">
+      <div class="image-overlay2"></div>
+    </label>
+    <input type="file" id="fileInput">
+    <button id="revealInfo" class="revealInfo">
+      <div class="image-overlay3"></div>
+    </button>
+    <button id="MoreInfo" class="moreInfo-button">
+      <div class="image-overlay"></div>
+    </button>
+  </body>
+</html>
